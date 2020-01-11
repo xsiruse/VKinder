@@ -59,7 +59,8 @@ class User:
         self.relation = interests['relation']
         self.groups = self.op_se.groups.get()
         self.friends = self.op_se.friends.get()
-        self.interests = {}
+        self.interests = (interests['interests'] + ' ' + interests['books'] + ' ' + interests['music']
+                          ).replace(',', '').split(' ')
         self.country = interests['country']
         self.city = interests['city']['id']
         self.age = datetime.now().year - bdate.year - (
@@ -114,6 +115,7 @@ class User:
                 time.sleep(1)
                 continue
         group_matches = sorted(group_matches.items(), key=operator.itemgetter(1), reverse=True)
+        print('group_matches: ', group_matches)
         return group_matches
 
     def count_interests_match_points(self, users_list):
@@ -125,9 +127,8 @@ class User:
                 print('..u')
                 time.sleep(0.34)
                 try:
-                    interests = \
-                        (user[0]['music'] + ' ' + user[0]['interests'] + ' ' + user[0]['books']
-                         ).replace(',', '').split(' ')
+                    interests = (user[0]['music'] + ' ' + user[0]['interests'] + ' ' + user[0]['books']
+                                 ).replace(',', '').split(' ')
                     interests_filter = [item for item in interests if item != '']
                 except KeyError:
                     continue
@@ -139,6 +140,7 @@ class User:
                 time.sleep(1)
                 continue
         interests_matches = sorted(interests_matches.items(), key=operator.itemgetter(1), reverse=True)
+        print('interests_matches: ', interests_matches)
         return interests_matches
 
     def count_total_match_points(self, interests_matches, group_matches):
@@ -148,7 +150,7 @@ class User:
             total_match_points.update(item)
         total_match_points = dict(total_match_points)
         total_match_points = sorted(total_match_points.items(), key=operator.itemgetter(1), reverse=True)
-        print(total_match_points)
+        print('total_match_points: ', total_match_points)
         return total_match_points
 
     def get_top10users(self, total_match_points, skip_ids):
@@ -156,7 +158,7 @@ class User:
         for uid in total_match_points[0:10]:
             if uid[0] not in skip_ids:
                 top_10_users.append(uid[0])
-        print(top_10_users)
+        print('top_10_users: ', top_10_users)
         return top_10_users
 
     def get_photos(self, top_10_users):
